@@ -68,7 +68,7 @@ The query should work with any dataset.
 SELECT SUM(dt.delivery_income) as delivery_incomes
 FROM 
     orders o
-    JOIN countries c ON o.country_id = c.id AND o.iso <> 'ES'
+    JOIN countries c ON o.country_id = c.id AND c.iso <> 'ES'
     JOIN (
         SELECT 
             order_id, 
@@ -87,3 +87,32 @@ FROM
         FROM delivery_types) dt ON dt.id = o.delivery_type_id;
 
 ```
+
+### Solution 2:
+
+```sql
+SELECT 
+    SUM(CASE 
+        WHEN c.iso = 'ES' THEN 0 -- No shipping cost for orders from Spain
+        WHEN order_total >= 50 THEN 0 -- No shipping cost for orders >= €50
+        WHEN dt.name = 'ORDINARY DELIVERY' THEN 3.95 -- Shipping cost for ORDINARY DELIVERY
+        WHEN dt.name = 'URGENT DELIVERY' THEN 7.5  -- Shipping cost for URGENT DELIVERY
+        ELSE 0
+    END) AS delivery_incomes
+FROM 
+    orders o
+    JOIN countries c ON o.country_id = c.id
+    JOIN delivery_types dt ON o.delivery_type_id = dt.id
+    LEFT JOIN (
+        SELECT
+            order_id,
+            ROUND(SUM(price * units), 2) AS order_total
+        FROM 
+            order_items oi
+            JOIN item_references ir ON oi.item_reference_id = ir.id
+        GROUP BY
+            order_id
+    ) AS order_totals ON o.id = order_totals.order_id;
+
+```
+
