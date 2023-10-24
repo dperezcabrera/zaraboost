@@ -112,6 +112,81 @@ def getMaximumNumberItems(items):
 <br/>
 <br/>
 
+
+**C# (short)**
+```c#
+
+public static int GetMaximumNumberItems(int[] items) {
+    var occurrences = items.GroupBy(i => i).ToDictionary(g => g.Key, g => g.Count());
+    return occurrences.Keys.Max(k => occurrences[k] + occurrences.GetValueOrDefault(k + 1, 0));
+}
+
+```
+    
+<br/>
+<br/>
+
+**C (short)**
+```c
+
+int getMaximumNumberItems(int items[], int n) {
+    int occurrences[101] = {0};
+    for(int i = 0; i < n; i++) {
+        occurrences[items[i]]++;
+    }
+    int result = 0;
+    for(int i = 0; i < 100; i++) {
+        int length = occurrences[i] + occurrences[i + 1];
+        if(length > result) {
+            result = length;
+        }
+    }
+    return result;
+}
+
+```
+    
+<br/>
+<br/>
+
+**C++ (short)**
+```c++
+
+int getMaximumNumberItems(int items[], int n) {
+    unordered_map<int, int> occurrences;
+    for(int i = 0; i < n; i++) {
+        occurrences[items[i]]++;
+    }
+    int result = 0;
+    for(auto &[value, count] : occurrences) {
+        result = max(result, count + occurrences[value + 1]);
+    }
+    return result;
+}
+
+```
+    
+<br/>
+<br/>
+
+**PHP (short)**
+```php
+
+function getMaximumNumberItems($items) {
+    $occurrences = array_count_values($items);
+    $result = 0;
+    foreach($occurrences as $value => $count) {
+        $length = $count + ($occurrences[$value + 1] ?? 0);
+        $result = max($result, $length);
+    }
+    return $result;
+}
+
+```
+    
+<br/>
+<br/>
+
 **Javascript**
 
 ```js
@@ -191,4 +266,139 @@ def getMaximumNumberItems(items):
     return result
 
 ```
+<br/>
+<br/>
 
+**Go**
+```go
+
+func getMaximumNumberItems(items []int) int {
+	occurrences := make(map[int]int)
+	for _, item := range items {
+		occurrences[item]++
+	}
+
+	maxCount := 0
+	for value, count := range occurrences {
+		maxCount = max(maxCount, count+occurrences[value+1])
+	}
+	return maxCount
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+```
+<br/>
+<br/>
+
+**Rust**
+```rust
+
+fn get_maximum_number_items(items: &[i32]) -> i32 {
+    let mut occurrences = HashMap::new();
+    for &item in items.iter() {
+        *occurrences.entry(item).or_insert(0) += 1;
+    }
+
+    occurrences.keys().cloned().map(|k| occurrences[&k] + *occurrences.get(&(k+1)).unwrap_or(&0)).max().unwrap_or(0)
+}
+
+```
+
+<br/>
+<br/>
+
+**Ruby**
+```ruby
+
+def get_maximum_number_items(items)
+  occurrences = items.group_by(&:itself).transform_values(&:count)
+  occurrences.keys.map { |k| occurrences[k] + occurrences[k + 1].to_i }.max
+end
+
+```
+
+<br/>
+<br/>
+
+**Groovy**
+```groovy
+
+def getMaximumNumberItems(items) {
+    def occurrences = items.groupBy { it }.collectEntries { [(it.key): it.value.size()] }
+    occurrences.keySet().collect { k -> occurrences[k] + (occurrences[k + 1] ?: 0) }.max()
+}
+
+```
+
+<br/>
+<br/>
+
+**Kotlin**
+```kotlin
+
+fun getMaximumNumberItems(items: List<Int>): Int {
+    val occurrences = items.groupingBy { it }.eachCount()
+    return occurrences.keys.map { k -> occurrences[k]!! + (occurrences[k + 1] ?: 0) }.maxOrNull() ?: 0
+}
+
+```
+<br/>
+<br/>
+
+**Swift**
+```swift
+
+func getMaximumNumberItems(_ items: [Int]) -> Int {
+    let occurrences = Dictionary(items.map { ($0, 1) }, uniquingKeysWith: +)
+    return occurrences.keys.map { key in
+        return occurrences[key, default: 0] + occurrences[key + 1, default: 0]
+    }.max() ?? 0
+}
+
+```
+
+
+<br/>
+<br/>
+
+**Pascal**
+```pascal
+
+function GetMaximumNumberItems(Items: array of Integer): Integer;
+var
+    Occurrences: TFPList;
+    I, Value, MaxCount: Integer;
+begin
+    Occurrences := TFPList.Create;
+    try
+        for I := 0 to High(Items) do
+        begin
+            Value := Items[I];
+            if Occurrences.IndexOf(Pointer(Value)) = -1 then
+                Occurrences.Add(Pointer(1))
+            else
+                Occurrences[Occurrences.IndexOf(Pointer(Value))] := Pointer(Integer(Occurrences[Occurrences.IndexOf(Pointer(Value))]) + 1);
+        end;
+
+        MaxCount := 0;
+        for I := 0 to Occurrences.Count - 1 do
+        begin
+            Value := Integer(Occurrences[I]);
+            if Occurrences.IndexOf(Pointer(Value + 1)) <> -1 then
+                Value := Value + Integer(Occurrences[Occurrences.IndexOf(Pointer(Value + 1))]);
+            if Value > MaxCount then
+                MaxCount := Value;
+        end;
+
+        Result := MaxCount;
+    finally
+        Occurrences.Free;
+    end;
+end;
+```
